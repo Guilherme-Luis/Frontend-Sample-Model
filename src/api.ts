@@ -203,13 +203,9 @@ export async function login(email: string, password: string): Promise<{
   payload: unknown | null
   raw: unknown
 }> {
-  const fd = new FormData()
-  fd.set('email', email)
-  fd.set('password', password)
-
   const raw = await requestJson<unknown>('POST', '/auth/login', {
     auth: false,
-    body: fd,
+    body: { email, password },
   })
 
   if (!isRecord(raw) || typeof raw.token !== 'string') {
