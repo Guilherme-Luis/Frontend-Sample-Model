@@ -91,7 +91,9 @@ export function clearConfigOverrides(): void {
 function buildBaseUrl(): string {
   if (import.meta.env.DEV) return '/__api'
 
-  return '/api'
+  const { apiOrigin, environment } = getEffectiveConfig()
+  const envPart = environment ? `/${environment}` : ''
+  return `${apiOrigin}${envPart}/api`
 }
 
 function buildUrl(pathname: string): string {
