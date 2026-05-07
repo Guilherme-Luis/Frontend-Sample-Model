@@ -6,23 +6,27 @@ on:
       - 'v*.*.*'
 
 jobs:
-  release:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
+      - name: Run TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Build Vite project
         run: npm run build
 
-      - name: Release completed
-        run: echo "Frontend release executed successfully"
+      - name: Frontend release success
+        run: echo "Frontend build completed successfully"
