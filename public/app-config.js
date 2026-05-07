@@ -1,4 +1,4 @@
 window.__APP_CONFIG__ = {
-  apiOrigin: "http://localhost:3003",
-  environment: "development",
+  apiOrigin: "https://api-sample-model.onrender.com/",
+  environment: "production",
 };
