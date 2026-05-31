@@ -106,6 +106,27 @@ export function apiUrl(pathname: string): string {
   return buildUrl(pathname)
 }
 
+function buildServiceUrl(pathname: string): string {
+  const { apiOrigin } = getEffectiveConfig()
+  const path = pathname.startsWith('/') ? pathname : `/${pathname}`
+  return `${apiOrigin}${path}`
+}
+
+async function requestServiceJson(pathname: string): Promise<unknown> {
+  const res = await fetch(buildServiceUrl(pathname))
+  const data = await readBody(res)
+  if (!res.ok) throw toApiProblem(res.status, data)
+  return data
+}
+
+export async function checkApiBase(): Promise<unknown> {
+  return await requestServiceJson('/')
+}
+
+export async function checkApiV1(): Promise<unknown> {
+  return await requestServiceJson('/v1')
+}
+
 export function fileDownloadUrl(fileId: string): string {
   return apiUrl(`/files/${encodeURIComponent(fileId)}/download`)
 }

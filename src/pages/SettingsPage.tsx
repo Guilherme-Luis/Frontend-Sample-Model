@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import {
+  checkApiBase,
+  checkApiV1,
   clearConfigOverrides,
   decodeJwtPayload,
   getAuthToken,
@@ -17,7 +19,9 @@ export function SettingsPage() {
   const [environment, setEnvironment] = useState(cfg.environment)
 
   const [busy, setBusy] = useState(false)
+  const [testBusy, setTestBusy] = useState(false)
   const [error, setError] = useState<unknown>(null)
+  const [testResult, setTestResult] = useState<unknown>(null)
   const token = getAuthToken()
   const payload = token ? decodeJwtPayload(token) : null
 
@@ -41,6 +45,20 @@ export function SettingsPage() {
     setCfg(next)
     setApiOrigin(next.apiOrigin)
     setEnvironment(next.environment)
+  }
+
+  async function onTestApi() {
+    setTestBusy(true)
+    setError(null)
+    setTestResult(null)
+    try {
+      const [base, v1] = await Promise.all([checkApiBase(), checkApiV1()])
+      setTestResult({ base, v1 })
+    } catch (err) {
+      setError(err)
+    } finally {
+      setTestBusy(false)
+    }
   }
 
   return (
@@ -85,6 +103,12 @@ export function SettingsPage() {
           </form>
 
           <div className="hr" />
+          <div className="row">
+            <Button type="button" variant="secondary" onClick={onTestApi} disabled={testBusy}>
+              {testBusy ? 'Testando...' : 'Testar / e /v1'}
+            </Button>
+          </div>
+          {testResult ? <JsonView value={testResult} /> : null}
           <p className="muted small">
             Base atual: <InlineCode>{cfg.apiOrigin}</InlineCode> / Env:{' '}
             <InlineCode>{cfg.environment || '(vazio)'}</InlineCode>
